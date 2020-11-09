@@ -15,6 +15,14 @@
             <td>${book.id}</td>
             <td>${book.bookName}</td>
             <td>${book.author}</td>
+            <td>
+                <a href='<c:url value="/edit?id=${book.id}" />'>Edit</a>
+                <form method="post" action='<c:url value="/delete" />' style="display:inline;">
+                    <input type="hidden" name="id" value="${book.id}">
+                    <input type="submit" value="Delete">
+                </form>
+            </td>
+
         </tr>
     </c:forEach>
 </table>

@@ -1,4 +1,4 @@
-package Entities;
+package com.training.library.entity;
 
 import java.io.Serializable;
 
