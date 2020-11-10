@@ -16,12 +16,9 @@ public class EditBookServlet extends HttpServlet {
     PrintWriter writer = response.getWriter();
         try {
             Long id = Long.parseLong(request.getParameter("id"));
-            writer.println("Good operation");
             Book book = databaseService.selectById(id, databaseService.setConnection());
-            writer.println("Good operation");
             if(book!=null) {
                 request.setAttribute("book", book);
-                writer.println("Good operation");
                 getServletContext().getRequestDispatcher("/edit.jsp").forward(request, response);
             }
             else {
@@ -29,7 +26,7 @@ public class EditBookServlet extends HttpServlet {
             }
         }
         catch(Exception ex) {
-            ex.printStackTrace();
+            writer.println("Failed to get data");
         }
     }
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

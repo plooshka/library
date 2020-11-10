@@ -1,30 +1,37 @@
 package com.training.library.service;
 
+import com.mysql.cj.jdbc.Driver;
 import com.training.library.entity.Book;
-import java.lang.reflect.InvocationTargetException;
-import java.sql.*;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Properties;
 
 public class DatabaseService {
-
-    private final String url = "jdbc:mysql://localhost:3306/library?serverTimezone=Europe/Moscow&useSSL=false";
-    private final String username = "root";
-    private final String password = "12345";
 
     public DatabaseService() {
     }
 
     public Connection setConnection() throws
-            ClassNotFoundException,
-            NoSuchMethodException,
-            IllegalAccessException,
-            InvocationTargetException,
-            InstantiationException,
-            SQLException {
-        Class.forName("com.mysql.cj.jdbc.Driver").getDeclaredConstructor().newInstance();
-        return DriverManager.getConnection(url, username, password);
+            SQLException, IOException {
+        FileInputStream fis;
+        Properties property = new Properties();
+            fis = new FileInputStream("C:\\Users\\expla\\IdeaProjects\\demo\\src\\main\\resources\\config.properties");
+            property.load(fis);
+        Driver driver = new Driver();
+        DriverManager.registerDriver(driver);
+        return  DriverManager.getConnection(
+                property.getProperty("db.host"),
+                property.getProperty("db.login"),
+                property.getProperty("db.password"));
     }
 
     public void insert(Book book, Connection conn) throws SQLException {
@@ -34,11 +41,10 @@ public class DatabaseService {
         preparedStatement.setString(1, book.getBookName());
         preparedStatement.setString(2, book.getAuthor());
         preparedStatement.executeUpdate();
-
+        conn.close();
     }
 
-    public List<Book> selectAll(Connection conn) {
-
+    public List<Book> selectAll(Connection conn) throws SQLException {
         List<Book> books = new ArrayList<Book>();
         try {
             Statement statement = conn.createStatement();
@@ -51,7 +57,9 @@ public class DatabaseService {
                 books.add(book);
             }
         } catch (Exception ex) {
-            System.out.println(ex);
+            ex.printStackTrace();
+        } finally {
+            conn.close();
         }
         return books;
     }
@@ -77,9 +85,9 @@ public class DatabaseService {
                 String author = resultSet.getString(3);
                 return new Book(id, bookName, author);
             } else {
-                //
+                return null;
             }
-            return null;
+
         }
     }
     public void delete(Long id, Connection conn) throws SQLException {
@@ -87,8 +95,8 @@ public class DatabaseService {
                 try(PreparedStatement preparedStatement = conn.prepareStatement(sql)){
                     preparedStatement.setLong(1, id);
                     preparedStatement.executeUpdate();
-                } catch (SQLException sqlException) {
-                    sqlException.printStackTrace();
+                } catch (Exception exception) {
+                    exception.printStackTrace();
                 }
 
 }
